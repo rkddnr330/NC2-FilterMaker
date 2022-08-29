@@ -55,8 +55,18 @@ class HomeViewController: UIViewController {
             filterThumbnail.heightAnchor.constraint(equalToConstant: 200)
         ])
         
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(imageTapped(tapGestureRecognizer:)))
+        filterThumbnail.isUserInteractionEnabled = true
+        filterThumbnail.addGestureRecognizer(tapGestureRecognizer)
     }
 
+    @objc func imageTapped(tapGestureRecognizer: UITapGestureRecognizer)
+    {
+//        let tappedImage = tapGestureRecognizer.view as! UIImageView
+
+        print("tapped!")
+    }
+    
     private func addThumbnailImage(of image: String) {
         filterThumbnail.image = UIImage(named: image)
     }
