@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import CreateML
+import CoreML
 import Vision
 
 class HomeViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
