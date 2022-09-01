@@ -6,8 +6,10 @@
 //
 
 import UIKit
+import CoreML
+import Vision
 
-class HomeViewController: UIViewController {
+class HomeViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     let remarkText: UILabel = {
         let label = UILabel()
@@ -58,6 +60,7 @@ class HomeViewController: UIViewController {
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(imageTapped(tapGestureRecognizer:)))
         filterThumbnail.isUserInteractionEnabled = true
         filterThumbnail.addGestureRecognizer(tapGestureRecognizer)
+        
     }
 
     @objc func imageTapped(tapGestureRecognizer: UITapGestureRecognizer)
@@ -65,9 +68,18 @@ class HomeViewController: UIViewController {
 //        let tappedImage = tapGestureRecognizer.view as! UIImageView
 
         print("tapped!")
+//        present(imagePicker, animated: true, completion: nil)
+        self.navigationController?.pushViewController(FilterViewController(), animated: true)
+        
     }
     
     private func addThumbnailImage(of image: String) {
         filterThumbnail.image = UIImage(named: image)
     }
 }
+
+//extension HomeViewController {
+//    func didSelect(image: UIImage?) {
+//        self.imagePicker.image = image
+//    }
+//}
