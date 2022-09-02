@@ -10,44 +10,57 @@ import Vision
 
 class FilterViewController: UIViewController, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
 
-    let imageArea: UILabel = {
+    // MARK: - 프로퍼티
+    
+    private let imageArea: UILabel = {
         let label = UILabel()
         label.text = "사진 선택"
         label.backgroundColor = .lightGray
         label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    let selectedImage: UIImageView = {
+    private let selectedImage: UIImageView = {
         let iv = UIImageView()
-//        iv.image = UIImage(named:"")
         iv.isUserInteractionEnabled = true
         iv.clipsToBounds = true
         iv.contentMode = .scaleAspectFit
         iv.translatesAutoresizingMaskIntoConstraints = false
-            
         return iv
     }()
     
-    let button: UILabel = {
-        let label = UILabel()
-        label.text = "필터 적용"
-        label.backgroundColor = .lightGray
-        label.textAlignment = .center
-        return label
+    private let filterBtn: UIButton = {
+        let filterBtn = UIButton()
+        filterBtn.setTitle("필터 적용", for: .normal)
+        filterBtn.setTitleColor(.black, for: .normal)
+        filterBtn.titleLabel?.font = UIFont.systemFont(ofSize: 17)
+        filterBtn.backgroundColor = .lightGray
+        filterBtn.setPreferredSymbolConfiguration(.init(pointSize: 3, weight: .regular, scale: .default), forImageIn: .normal)
+        filterBtn.tintColor = .black
+        filterBtn.translatesAutoresizingMaskIntoConstraints = false
+        return filterBtn
     }()
     
-    let imagePicker = UIImagePickerController()
+    private let imagePicker = UIImagePickerController()
+    
+    // MARK: - viewDidLoad
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .gray
         
-        
-        // MARK: - 사진 선택
+        setupSelectImgBtn()     // 사진 선택 버튼
+        setupFilterBtn()        // 필터 적용 버튼
+        openPhotoLibrary()      // 앨범 열기
+        loadSelectedImg()       // 사진 띄우기
+    }
+
+    // MARK: - 메소드
+    
+    private func setupSelectImgBtn() {
         imageArea.textColor = .black
         view.addSubview(imageArea)
-        imageArea.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             imageArea.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
@@ -55,59 +68,21 @@ class FilterViewController: UIViewController, UIImagePickerControllerDelegate & 
             imageArea.widthAnchor.constraint(equalToConstant: 100),
             imageArea.heightAnchor.constraint(equalToConstant: 70)
         ])
-        
-        // MARK: - 핕터 적용
-//        view.addSubview(button)
-//        button.translatesAutoresizingMaskIntoConstraints = false
-//
-//        NSLayoutConstraint.activate([
-//            button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
-//            button.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
-//            button.widthAnchor.constraint(equalToConstant: 100),
-//            button.heightAnchor.constraint(equalToConstant: 70)
-//        ])
-//
-//        let goFilter = UITapGestureRecognizer(target: self, action: #selector(transformImage(tapGestureRecognizer:)))
-//        imageArea.isUserInteractionEnabled = true
-//        imageArea.addGestureRecognizer(goFilter)
-        
-        
-        let filterBtn = UIButton()
-        //title
-        filterBtn.setTitle("필터 적용", for: .normal)
-
-        //title color
-        filterBtn.setTitleColor(.black, for: .normal)
-
-        //title fontsize
-        filterBtn.titleLabel?.font = UIFont.systemFont(ofSize: 17)
-
-        filterBtn.backgroundColor = .lightGray
-
-
-        //imageview image size
-        filterBtn.setPreferredSymbolConfiguration(.init(pointSize: 3, weight: .regular, scale: .default), forImageIn: .normal)
-
-        //imageview image color
-        filterBtn.tintColor = .black
-
-        //UIButton insets
-//        filterBtn.titleEdgeInsets = .init(top: .zero, left: 8, bottom: .zero, right: .zero)
-
-        //UIButton add action
+    }
+    
+    private func setupFilterBtn() {
+        view.addSubview(filterBtn)
         filterBtn.addTarget(self, action: #selector(transformImage), for: .touchUpInside)
         
-        view.addSubview(filterBtn)
-        
-        filterBtn.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             filterBtn.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
             filterBtn.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
             filterBtn.widthAnchor.constraint(equalToConstant: 100),
             filterBtn.heightAnchor.constraint(equalToConstant: 70)
         ])
-        
-        // MARK: - 카메라 켜기
+    }
+    
+    private func openPhotoLibrary() {
         imagePicker.sourceType = .photoLibrary
         imagePicker.allowsEditing = true
         imagePicker.delegate = self
@@ -115,8 +90,9 @@ class FilterViewController: UIViewController, UIImagePickerControllerDelegate & 
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(imageTapped(tapGestureRecognizer:)))
         imageArea.isUserInteractionEnabled = true
         imageArea.addGestureRecognizer(tapGestureRecognizer)
-        
-        // MARK: - 사진 띄우기
+    }
+    
+    private func loadSelectedImg() {
         if selectedImage.image?.size.height != 0 {
             view.addSubview(selectedImage)
             selectedImage.translatesAutoresizingMaskIntoConstraints = false
@@ -131,26 +107,18 @@ class FilterViewController: UIViewController, UIImagePickerControllerDelegate & 
             selectedImage.clipsToBounds = true
         }
     }
-
-    @objc func imageTapped(tapGestureRecognizer: UITapGestureRecognizer) {
+    
+    @objc private func imageTapped(tapGestureRecognizer: UITapGestureRecognizer) {
         imagePicker.delegate = self
-        
         present(imagePicker, animated: true, completion: nil)
-                
     }
     
-    @objc func transformImage() {
-        print("필터 버튼 탭")
-        // Style Transfer Here
+    @objc private func transformImage() {
         let model = Gogh()
-//        let styleArray = try? MLMultiArray(shape: [1] as [NSNumber], dataType: .double)
-//        styleArray?[0] = 1.0
-//        print(styleArray)
         
         if let image = pixelBuffer(from: selectedImage.image!) {
             do {
                 let predictionOutput = try model.prediction(image: image)
-                        
                 let ciImage = CIImage(cvPixelBuffer: predictionOutput.stylizedImage)
                 let tempContext = CIContext(options: nil)
                 let tempImage = tempContext.createCGImage(ciImage, from: CGRect(x: 0, y: 0, width: CVPixelBufferGetWidth(predictionOutput.stylizedImage), height: CVPixelBufferGetHeight(predictionOutput.stylizedImage)))
@@ -164,27 +132,17 @@ class FilterViewController: UIViewController, UIImagePickerControllerDelegate & 
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let imagePicked = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
             selectedImage.image = imagePicked
-            guard let ciimage = CIImage(image: imagePicked) else {
-                fatalError("Converting UIImage to CIImage Failed")
-            }
-            
-            
         }
         
-        imagePicker.dismiss(animated: true) {
-            print("Picker Dismissed...")
-        }
-
+        imagePicker.dismiss(animated: true)
     }
-    
 }
 
-// MARK: - ML 코드 작성
+// MARK: - ML 코드
 
 extension FilterViewController {
-
-
-    func pixelBuffer(from image: UIImage) -> CVPixelBuffer? {
+    private func pixelBuffer(from image: UIImage) -> CVPixelBuffer? {
+        
         // 1. Since our model only accepts images with dimensions of 256 x 256, we convert the image into a square. Then, we assign the square image to another constant newImage.
         UIGraphicsBeginImageContextWithOptions(CGSize(width: 512, height: 512), true, 2.0)
         image.draw(in: CGRect(x: 0, y: 0, width: 512, height: 512))

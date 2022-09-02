@@ -77,9 +77,3 @@ class HomeViewController: UIViewController, UIImagePickerControllerDelegate, UIN
         filterThumbnail.image = UIImage(named: image)
     }
 }
-
-//extension HomeViewController {
-//    func didSelect(image: UIImage?) {
-//        self.imagePicker.image = image
-//    }
-//}
