@@ -21,7 +21,16 @@ class FilterViewController: UIViewController, UIImagePickerControllerDelegate & 
         return label
     }()
     
-    private let selectedImage: UIImageView = {
+    private let cameraBtn2: UILabel = {
+        let label = UILabel()
+        label.text = "사진 촬영"
+        label.backgroundColor = .lightGray
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private var selectedImage: UIImageView = {
         let iv = UIImageView()
         iv.isUserInteractionEnabled = true
         iv.clipsToBounds = true
@@ -42,7 +51,20 @@ class FilterViewController: UIViewController, UIImagePickerControllerDelegate & 
         return filterBtn
     }()
     
+    private let cameraBtn: UIButton = {
+        let filterBtn = UIButton()
+        filterBtn.setTitle("사진 촬영", for: .normal)
+        filterBtn.setTitleColor(.black, for: .normal)
+        filterBtn.titleLabel?.font = UIFont.systemFont(ofSize: 17)
+        filterBtn.backgroundColor = .lightGray
+        filterBtn.setPreferredSymbolConfiguration(.init(pointSize: 3, weight: .regular, scale: .default), forImageIn: .normal)
+        filterBtn.tintColor = .black
+        filterBtn.translatesAutoresizingMaskIntoConstraints = false
+        return filterBtn
+    }()
+    
     private let imagePicker = UIImagePickerController()
+    private let imagePicker2 = UIImagePickerController()
     
     // MARK: - viewDidLoad
     
@@ -51,6 +73,9 @@ class FilterViewController: UIViewController, UIImagePickerControllerDelegate & 
         view.backgroundColor = .gray
         
         setupSelectImgBtn()     // 사진 선택 버튼
+//        setupCameraBtn()
+        setupCameraBtn2()
+        openCamera2()
         setupFilterBtn()        // 필터 적용 버튼
         openPhotoLibrary()      // 앨범 열기
         loadSelectedImg()       // 사진 띄우기
@@ -64,23 +89,60 @@ class FilterViewController: UIViewController, UIImagePickerControllerDelegate & 
         
         NSLayoutConstraint.activate([
             imageArea.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
-            imageArea.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
-            imageArea.widthAnchor.constraint(equalToConstant: 100),
-            imageArea.heightAnchor.constraint(equalToConstant: 70)
+            imageArea.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -150),
+            imageArea.widthAnchor.constraint(equalToConstant: 150),
+            imageArea.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
+    
+    private func setupCameraBtn2() {
+        cameraBtn2.textColor = .black
+        view.addSubview(cameraBtn2)
+        
+        NSLayoutConstraint.activate([
+            cameraBtn2.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
+            cameraBtn2.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -150),
+            cameraBtn2.widthAnchor.constraint(equalToConstant: 150),
+            cameraBtn2.heightAnchor.constraint(equalToConstant: 50)
+        ])
+    }
+    
+//    private func setupCameraBtn() {
+//        view.addSubview(cameraBtn)
+//        cameraBtn.addTarget(self, action: #selector(openCamera), for: .touchUpInside)
+//
+//        NSLayoutConstraint.activate([
+//            cameraBtn.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
+//            cameraBtn.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -150),
+//            cameraBtn.widthAnchor.constraint(equalToConstant: 150),
+//            cameraBtn.heightAnchor.constraint(equalToConstant: 50)
+//        ])
+//    }
     
     private func setupFilterBtn() {
         view.addSubview(filterBtn)
         filterBtn.addTarget(self, action: #selector(transformImage), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
-            filterBtn.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
-            filterBtn.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
-            filterBtn.widthAnchor.constraint(equalToConstant: 100),
-            filterBtn.heightAnchor.constraint(equalToConstant: 70)
+            filterBtn.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            filterBtn.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -80),
+            filterBtn.widthAnchor.constraint(equalToConstant: 330),
+            filterBtn.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
+    
+//    @objc func openCamera() {
+//        print("camera")
+//        imagePicker2.sourceType = .camera
+//        imagePicker2.allowsEditing = true
+//        imagePicker2.delegate = self
+//
+//        present(imagePicker2, animated: true, completion: nil)
+////        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(imageTapped(tapGestureRecognizer:)))
+////        imageArea.isUserInteractionEnabled = true
+////        imageArea.addGestureRecognizer(tapGestureRecognizer)
+//        loadSelectedImg()
+//    }
     
     private func openPhotoLibrary() {
         imagePicker.sourceType = .photoLibrary
@@ -90,6 +152,16 @@ class FilterViewController: UIViewController, UIImagePickerControllerDelegate & 
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(imageTapped(tapGestureRecognizer:)))
         imageArea.isUserInteractionEnabled = true
         imageArea.addGestureRecognizer(tapGestureRecognizer)
+    }
+    
+    private func openCamera2(){
+        imagePicker2.sourceType = .camera
+        imagePicker2.allowsEditing = true
+        imagePicker2.delegate = self
+        
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(imageTapped2(tapGestureRecognizer:)))
+        cameraBtn2.isUserInteractionEnabled = true
+        cameraBtn2.addGestureRecognizer(tapGestureRecognizer)
     }
     
     private func loadSelectedImg() {
@@ -110,7 +182,16 @@ class FilterViewController: UIViewController, UIImagePickerControllerDelegate & 
     
     @objc private func imageTapped(tapGestureRecognizer: UITapGestureRecognizer) {
         imagePicker.delegate = self
+        
         present(imagePicker, animated: true, completion: nil)
+        
+    }
+    
+    @objc private func imageTapped2(tapGestureRecognizer: UITapGestureRecognizer) {
+        
+        imagePicker2.delegate = self
+        
+        present(imagePicker2, animated: true, completion: nil)
     }
     
     @objc private func transformImage() {
@@ -135,6 +216,7 @@ class FilterViewController: UIViewController, UIImagePickerControllerDelegate & 
         }
         
         imagePicker.dismiss(animated: true)
+        imagePicker2.dismiss(animated: true)
     }
 }
 
